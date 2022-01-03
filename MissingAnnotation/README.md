@@ -16,6 +16,11 @@ ResolveUnannotated.py finds unannotated regions in the iCount genomic segment (r
 **Dependencies**:
 ```
 python=3.7
+pandas
+plumbum
+pybedtools
+
+Versions of packages that were used for development and testing:
 pandas=0.24.2
 plumbum=1.6.8
 pybedtools=0.8.0
@@ -34,7 +39,7 @@ conda activate gtf-ops
 
 **Usage**
 ```
-ResolveUnnanotated.py [-h] -s SEGMENTATION -a ANNOTATION -fai FASTA_INDEX -o OUTPUTDIR
+python3 ResolveUnnanotated.py [-h] -s SEGMENTATION -a ANNOTATION -fai FASTA_INDEX -o OUTPUTDIR
 required arguments:
   -s, --segmentation SEGMENTATION
                         iCount genome level segmentation in GTF format i.e. "regions.gtf.gz".
@@ -43,7 +48,7 @@ required arguments:
   -fai, --fasta_index FASTA_INDEX
                        Fasta index file generated with samtools.
   -o, --outputdir OUTPUTDIR
-                        Path to output folder [default '.'].
+                        Path to output folder.
 ```
 
 **Outputs**

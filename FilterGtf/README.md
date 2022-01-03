@@ -15,6 +15,9 @@ Pre-filtering genomic annotation is crucial to ensure that accurate genome-level
 **Dependencies**:
 ```
 python=3.7
+pandas
+
+Vesions used in development and testing:
 pandas=0.24.2
 ```
 
@@ -31,10 +34,10 @@ conda activate gtf-ops
 
 **Usage**
 ```
-FilterGtf.py [-h] -a ANNOTATION -o OUTPUTDIR
+python3 FilterGtf.py [-h] -a ANNOTATION -o OUTPUTDIR
 Required arguments:
   -a, --annotation ANNOTATION: Annotation file from GENCODE or ENSEMBL in GTF format.
-  -o, --outputdir OUTPUTDIR: Path to output folder [default '.'].
+  -o, --outputdir OUTPUTDIR: Path to output folder.
 ```
 
 **Outputs**
