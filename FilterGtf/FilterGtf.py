@@ -1,3 +1,4 @@
+from __future__ import annotations
 import pandas as pd
 import csv
 import argparse
@@ -34,20 +35,29 @@ def filter_gff(gtf_file, outputdir):
                                     })
     # Filter transcripts by basic tag
     print("Number of entries in input annotation:", len(annotation))
+    print("Filtering for tag \"basic\"...")
     annotation = annotation.loc[annotation['annotations'].str.contains('tag "basic"') | (annotation['feature'] == 'gene'), :]
-    print("Number of entries after filtering for tag \"basic\":", len(annotation))
-    # Filter annotation gene-by-gene by transcript level support (TSL), to keep higher confidence transcripts where possible (TSL1 and 2)
-    df_TSL = annotation.loc[annotation['annotations'].str.contains('transcript_support_level "1|transcript_support_level "2', regex=True), :]
-    gene_ids = df_TSL["annotations"].str.split(";", n=1, expand=True)[0].unique().tolist()
-    print("Number of genes that contain TSL1 or TSL2 transcripts:", len(gene_ids))
-    # Keeping only TSL1 and TSL2 entries for genes that contain them, discardig other entries (no TSL information or TSL3-5)
-    print('Filtering out low-confidence transcripts.')
-    df_t = annotation.loc[(annotation['feature'] != 'gene') & (annotation['annotations'].str.contains('|'.join(gene_ids))) , :]
-    df_t = df_t.loc[~df_t['annotations'].str.contains('transcript_support_level "1"|transcript_support_level "2"', regex=True)]
-    annotation.drop(index=df_t.index, inplace=True)
-    print("Number of entries in filtered annotation.", len(annotation))
-    print('Saving filtered gtf file.')
-    annotation.to_csv(f"{outputdir}/filtered.{gtf_file.split('/')[-1]}", header=None, index=None, sep='\t', quoting=csv.QUOTE_NONE)
+    if len(annotation) > 0:
+        print("Number of entries after filtering for tag \"basic\":", len(annotation))
+        # Filter annotation gene-by-gene by transcript level support (TSL), to keep higher confidence transcripts where possible (TSL1 and 2)
+        df_TSL = annotation.loc[annotation['annotations'].str.contains('transcript_support_level "1|transcript_support_level "2', regex=True), :]
+        if len(df_TSL) > 0:
+            gene_ids = df_TSL["annotations"].str.split(";", n=1, expand=True)[0].unique().tolist()
+            print("Number of genes that contain TSL1 or TSL2 transcripts:", len(gene_ids))
+            # Keeping only TSL1 and TSL2 entries for genes that contain them, discardig other entries (no TSL information or TSL3-5)
+            print('Filtering out low-confidence transcripts.')
+            df_t = annotation.loc[(annotation['feature'] != 'gene') & (annotation['annotations'].str.contains('|'.join(gene_ids))) , :]
+            df_t = df_t.loc[~df_t['annotations'].str.contains('transcript_support_level "1"|transcript_support_level "2"', regex=True)]
+            annotation.drop(index=df_t.index, inplace=True)
+        else:
+            print(f"No information on transcript level support. Length of df_TSL {len(df_TSL)}")
+            print("Annotation was only filtered by tag \"basic\"")
+
+        print("Number of entries in filtered annotation.", len(annotation))
+        print('Saving filtered gtf file.')
+        annotation.to_csv(f"{outputdir}/filtered.{gtf_file.split('/')[-1]}", header=None, index=None, sep='\t', quoting=csv.QUOTE_NONE)
+    elif len(annotation) == 0:
+        print("No tag \"basic\" in annotation gtf. Exiting.")
 
 def main():
     (gtf_file, outputdir) = cli()
