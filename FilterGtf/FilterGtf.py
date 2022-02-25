@@ -57,8 +57,8 @@ def filter_gff(gtf_file, outputdir):
         print('Saving filtered gtf file.')
         annotation.to_csv(f"{outputdir}/filtered.{gtf_file.split('/')[-1]}", header=None, index=None, sep='\t', quoting=csv.QUOTE_NONE)
     else:
-        print('No tag \"basic\". Returning input annotation as output. Exiting.')
-        annotation.to_csv(f"{outputdir}/unfiltered.{gtf_file.split('/')[-1]}", header=None, index=None, sep='\t', quoting=csv.QUOTE_NONE)
+        print('No tag \"basic\". Exiting.')
+        exit()
 
 def main():
     (gtf_file, outputdir) = cli()
