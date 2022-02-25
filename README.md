@@ -1,6 +1,10 @@
 # gtf-ops
 
-Filtering GENCODE or ENSEMBLE annotation in GTF format. Annotating missing regions in iCount genomic segmentation.
+**FiterGtf module**: Filtering GENCODE or ENSEMBLE annotation in GTF format for tag "basic" (first step) and "transcript_support_level" (second step).
+
+🔴 **Important note: Currently, these tags are only available for Human (Hs) and Mouse (Mm) annotations.**
+
+**ResolveUnnanotated module**: Annotates missing regions in iCount genomic segmentation as "genic_other".
 
 ## Features
 
