@@ -6,6 +6,5 @@ authors:
   orcid: "https://orcid.org/0000-0002-8445-8080"
 title: "gtf-ops"
 version: 0.1.0
-doi: 10.5281/zenodo.1234
 date-released: 2022-06-10
 url: "https://github.com/ulelab/gtf-ops"
