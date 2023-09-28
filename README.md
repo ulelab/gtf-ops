@@ -1,5 +1,7 @@
 # gtf-ops
 
+[![DOI](https://zenodo.org/badge/442399085.svg)](https://zenodo.org/badge/latestdoi/442399085)
+
 **FiterGtf module**: Filtering GENCODE or ENSEMBLE annotation in GTF format for tag "basic" (first step) and "transcript_support_level" (second step).
 
 🔴 **Important note: Currently, these tags are only available for Human (Hs) and Mouse (Mm) annotations.**
