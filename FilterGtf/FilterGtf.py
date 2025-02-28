@@ -72,7 +72,7 @@ def filter_gff(gtf_file, outputdir):
                 # Keeping only TSL1 and TSL2 entries for genes that contain them, discardig other entries (no TSL information or TSL3-5)
                 print('Filtering out low-confidence transcripts.')
                 df_t = annotation.loc[(annotation['feature'] != 'gene') & (annotation['annotations'].str.contains('|'.join(gene_ids))) , :]
-                df_t = df_t.loc[~df_t['annotations'].str.contains('transcript_support_level "1"|transcript_support_level "2"', regex=True)]
+                df_t = df_t.loc[~df_t['annotations'].str.contains('transcript_support_level "1|transcript_support_level "2', regex=True)]
                 annotation.drop(index=df_t.index, inplace=True)
             else:
                 print("No TSL1 or TSL2 flag available.")
