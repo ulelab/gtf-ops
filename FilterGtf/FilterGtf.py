@@ -37,7 +37,8 @@ def filter_gff(gtf_file, outputdir):
     print("Number of entries in input annotation:", len(input_annotation))
     # Check if annotation contains tag "basic"
     print("Checking for basic flag...")
-    basic = input_annotation['annotations'].str.contains('basic', regex=True)
+    # Made basic more scpecific in case it would be part of gene-name or other annotation
+    basic = input_annotation['annotations'].str.contains('tag "basic"', regex=True)
     if basic.any():
         print("Basic flag available.")
         nbasic = basic.value_counts()[True]
@@ -65,14 +66,25 @@ def filter_gff(gtf_file, outputdir):
             print("transcript_support_level flag available.")
             if annotation['annotations'].str.contains('transcript_support_level "1|transcript_support_level "2', regex=True).any():
                 print("TSL1 or TSL2 flag available.")
+                # Get only TSL1 and TSL2 entries to perform elimination on
                 df_TSL = annotation.loc[annotation['annotations'].str.contains('transcript_support_level "1|transcript_support_level "2', regex=True), :]
                 # Get gene ids that contain TSL1 or TSL2 transcripts
-                gene_ids = df_TSL["annotations"].str.split(";", n=1, expand=True)[0].unique().tolist()
-                print("Number of genes that contain TSL1 or TSL2 transcripts:", len(gene_ids))
+                gene_ids_highconf = df_TSL["annotations"].str.split(";", n=1, expand=True)[0].unique().tolist()
+                print("Number of genes that contain TSL1 or TSL2 transcripts:", len(gene_ids_highconf))
                 # Keeping only TSL1 and TSL2 entries for genes that contain them, discardig other entries (no TSL information or TSL3-5)
                 print('Filtering out low-confidence transcripts.')
-                df_t = annotation.loc[(annotation['feature'] != 'gene') & (annotation['annotations'].str.contains('|'.join(gene_ids))) , :]
+                # Get all entries that are not gene entries and contain gene ids that contain TSL1 or TSL2 transcripts
+                df_t = annotation.loc[(annotation['feature'] != 'gene') & (annotation['annotations'].str.contains('|'.join(gene_ids_highconf))) , :]
+                # Remove TSL1 and TSL2 entries, this leaves lower-confidence entries
                 df_t = df_t.loc[~df_t['annotations'].str.contains('transcript_support_level "1|transcript_support_level "2', regex=True)]
+
+                # #  Add a check that no entries with TSL1 or TSL2 are kept
+                # if df_t['annotations'].str.contains('transcript_support_level "1|transcript_support_level "2', regex=True).any():
+                #     print('TSL1 / TSL2 are not being properly filtered, this should not happen.')
+                #     print('Returning input annotation as output. Exiting.')
+                #     input_annotation.to_csv(f"{outputdir}/unfiltered.{gtf_file.split('/')[-1]}", header=None, index=None, sep='\t', quoting=csv.QUOTE_NONE)
+                #     return
+                # else:(indent on next line)
                 annotation.drop(index=df_t.index, inplace=True)
             else:
                 print("No TSL1 or TSL2 flag available.")
@@ -80,6 +92,19 @@ def filter_gff(gtf_file, outputdir):
         else:
             print("No transcript_support_level flag available.")
             print("Keeping all transcripts flagged as basic.")
+        # # Check that each gene contains at least one transcript entry
+        # print("Checking if every gene contains at least one transcript entry.")
+        # input_gene_ids = set(input_annotation.loc[input_annotation['feature'] == 'gene', 'annotations'].str.split(";", n=1, expand=True)[0].unique().tolist())
+        # filtered_gene_ids = set(annotation.loc[annotation['feature'] == 'gene', 'annotations'].str.split(";", n=1, expand=True)[0].unique().tolist())
+
+        # if input_gene_ids == filtered_gene_ids:
+        #     print("Every gene contains at least one transcript entry.")
+        # else:
+        #     print("Some genes do not contain any transcript entry - this indicates that the input gtf may not be correctly annotated or that some entries are missing.")
+        #     print('Returning input annotation as output. Exiting.')
+        #     input_annotation.to_csv(f"{outputdir}/unfiltered.{gtf_file.split('/')[-1]}", header=None, index=None, sep='\t', quoting=csv.QUOTE_NONE)
+        #     return
+        
         print("Number of entries in filtered annotation.", len(annotation))
         print('Saving filtered gtf file.')
         annotation.to_csv(f"{outputdir}/filtered.{gtf_file.split('/')[-1]}", header=None, index=None, sep='\t', quoting=csv.QUOTE_NONE)
