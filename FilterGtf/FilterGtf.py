@@ -4,12 +4,12 @@ import argparse
 
 def cli():
     parser = argparse.ArgumentParser(description='Filter genomic annotation from GENCODE or ENSEMBL in GTF format by tag \"basic\" and transcript_support_level.'\
-    ' These flags are currently (20220223) annotated for Homo sapiens and Mus musculus organisms.')
+    ' These flags are currently (20250312) annotated for Homo sapiens and Mus musculus organisms.')
     required = parser.add_argument_group('required arguments')
     required.add_argument('-a', '--annotation', type=str, required=True,
                         help='Annotation file from GENCODE or ENSEMBL in GTF format.')
     required.add_argument('-o', '--outputdir', type=str, required=True,
-                        help='Path to output folder.', default='.')
+                        help='Path to output folder.')
     args = parser.parse_args()
     print(args)
     return(args.annotation, args.outputdir)
@@ -37,14 +37,14 @@ def filter_gff(gtf_file, outputdir):
     print("Number of entries in input annotation:", len(input_annotation))
     # Check if annotation contains tag "basic"
     print("Checking for basic flag...")
-    # Made basic more scpecific in case it would be part of gene-name or other annotation
+    # Made basic more specific in case it would be part of gene-name or other annotation
     basic = input_annotation['annotations'].str.contains('tag "basic"', regex=True)
     if basic.any():
         print("Basic flag available.")
         nbasic = basic.value_counts()[True]
         print(f"{nbasic} entries flagged as basic.")
         # Filter annotation for tag "basic", but keep all gene entries
-        annotation = input_annotation.loc[input_annotation['annotations'].str.contains('tag "basic"') | (input_annotation['feature'] == 'gene'), :]
+        annotation = input_annotation.loc[input_annotation['annotations'].str.contains('tag "basic"') | (input_annotation['feature'] == 'gene'), :].copy()
 
         # Check if every gene contains at least one transcript entry
         print("Checking if every gene contains at least one transcript entry: each gene should have a basic set of transcripts.")
